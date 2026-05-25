@@ -171,6 +171,12 @@ I'm a senior software engineer with twelve years building platforms. I was a fou
 
 This handbook is the product of working through what changes when most of the code stops being typed by hand.
 
+= A note on AI assistance
+
+The ideas and the framework are mine. I used AI to help write them down, to find prior work that grounds and challenges them, and to review the draft.
+
+Many hands did the work; the judgment stayed mine. That split is what the handbook is about, so it belongs in the open here too.
+
 = A note on the name and the claim
 
 This handbook describes a framework I call *Many Hands Engineering*. The name is mine. The ideas are not — they come from distributed systems, complex adaptive systems, commons governance, swarm intelligence, cybernetics, and military command doctrine, among others. Where I've coined a term or renamed an existing one, I say so and name the lineage. The goal is a shared language teams can actually use, not a claim of novelty. Provenance is tracked openly in Part IV.
