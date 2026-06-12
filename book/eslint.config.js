@@ -18,6 +18,8 @@ export default [
     settings: { react: { version: 'detect' } },
     rules: {
       ...react.configs.recommended.rules,
+      // Vite's automatic JSX runtime: no `import React` needed in JSX files.
+      ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       // Pedagogical prose inside JSX trips these constantly; same call as glassbox.
       'react/no-unescaped-entities': 'off',
