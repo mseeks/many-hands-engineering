@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Many Hands — the handbook, run</title>
+    <meta
+      name="description"
+      content="An interactive book that teaches Many Hands Engineering: placement, loops, signals, trust, and the approval that makes work real."
+    />
+    <script>
+      // Pre-paint theme: follow the OS until the reader picks, then their pick wins.
+      (function () {
+        try {
+          var stored = localStorage.getItem('mh-theme');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark';
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          /* default stays dark */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
