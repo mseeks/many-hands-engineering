@@ -60,7 +60,7 @@ export default function Ch05() {
       <Pull badge="W">The placement is the decision; the implementation follows from it.</Pull>
       <DecisionCard
         title="Before you place a decision"
-        items={[ '…the checklist an engineer needs at the moment of a real call…' ]}
+        items={['…the checklist an engineer needs at the moment of a real call…']}
       />
       <Coda line="The one idea to carry away." next="Where chapter N+1 picks this up." />
     </Chapter>
@@ -80,7 +80,7 @@ All shared components are exported from `src/components/kit.jsx` (one barrel). C
 import only from the barrel. Props below are contracts; do not add required props.
 
 - `<Chapter n covers>` — section wrapper: renders `<section class="mh-chapter" id="ch-N"
-  tabIndex={-1}>`, the eyebrow (`CH 05 · 14 MIN · COVERS §2.3` from the registry), and the
+tabIndex={-1}>`, the eyebrow (`CH 05 · 14 MIN · COVERS §2.3` from the registry), and the
   registry title as `<h2 class="mh-ch-title">`. Children follow.
 - `<Lede>` — italic opening stake (`.mh-lede`).
 - `<Pull badge?>` — pull quote (`.mh-pull`); optional badge letter `'E'|'W'|'M'`.
@@ -90,7 +90,7 @@ import only from the barrel. Props below are contracts; do not add required prop
   constructed-for-teaching).
 - `<FieldSpecimen source banner?>` — real-world artifact card (`.mh-specimen`); `source`
   like `'froot · ynab-agent#33 · 2026-06'`; default banner: `'N=1: one fleet, ~7 small
-  repos, ~30 PRs, a local judge model — feasibility evidence, not at-scale proof.'`
+repos, ~30 PRs, a local judge model — feasibility evidence, not at-scale proof.'`
   Children typically a `<pre>` with the verbatim artifact.
 - `<ModelNotes register notes cannotShow glass?>` — the honesty drawer (`.mh-notes`):
   `notes: string[]` (simplifications, tuned constants and why), `cannotShow: string`
@@ -107,7 +107,7 @@ import only from the barrel. Props below are contracts; do not add required prop
   over `trace.steps`, captions always visible, `renderStep(step)` optional custom snapshot.
   Play is gated by `usePrefersReducedMotion` (falls back to manual stepping).
 - `<Artifact lines>` — benchfile pane (`.mh-artifact`): `lines: [{ no, text, kind?:
-  'key'|'comment', hot?:bool, annot?:string }]`.
+'key'|'comment', hot?:bool, annot?:string }]`.
 - `<Quadrant value onChange>` — the placement 2×2 (`.mh-quadrant`): quadrant ids
   `'planned'` (top-left), `'emergent-spec'` (top-right), `'danger'` (bottom-left, styled
   `.danger`), `'emergent-explore'` (bottom-right); axes labeled Irreversible↔Reversible (x)

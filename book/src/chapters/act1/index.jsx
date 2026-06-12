@@ -1,7 +1,15 @@
+// Act I — The argument, run first. Chapters 1–3 in registry order.
+
+import Ch01 from './Ch01.jsx';
+import Ch02 from './Ch02.jsx';
+import Ch03 from './Ch03.jsx';
+
 export default function Act1() {
   return (
-    <div className="mh-chapter">
-      <p className="mh-lede">Act 1 is being set on the bench.</p>
-    </div>
+    <>
+      <Ch01 />
+      <Ch02 />
+      <Ch03 />
+    </>
   );
 }
