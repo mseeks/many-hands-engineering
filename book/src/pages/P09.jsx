@@ -385,11 +385,12 @@ function Scene({ phase, predictions, measured }) {
 
 export default function P09() {
   const reduced = usePrefersReducedMotion();
-  // Legible at rest: mount on the fully-graded frame so the page reads as a
-  // finished report card. The reader can re-predict and re-run from there.
+  // Commit before reveal: mount on the predict frame so the reader grades each
+  // guardrail first, then the storm swings the measured dials in beside the
+  // predictions. Showing the verdicts at rest would spoil the page's surprise.
   const [predictions, setPredictions] = useState({});
-  const [phase, setPhase] = useState('graded'); // 'predict' | 'storm' | 'graded'
-  const [measured, setMeasured] = useState(true);
+  const [phase, setPhase] = useState('predict'); // 'predict' | 'storm' | 'graded'
+  const [measured, setMeasured] = useState(false);
 
   const committed = GUARDS.filter((g) => predictions[g.id]).length;
   const allIn = committed === GUARDS.length;

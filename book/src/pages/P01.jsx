@@ -134,9 +134,14 @@ function StageNode({ node, active, done, redPath }) {
   );
 }
 
-function LoopCircuit({ idx, ci, ledger, redResolved }) {
-  // The token rides the ring; its fraction is the active node's index.
-  const t = idx / N;
+function LoopCircuit({ idx, ci, ledger, redResolved, rest }) {
+  // The token rides the ring; its fraction is the active node's index. AT REST
+  // on the closing frame it parks just past the update node on the dashed
+  // update→signal stanza (t = 0.86) instead of dead-centering update — so the
+  // coin never splits that node's word or covers its "ledger learns" sublabel
+  // (nor the top-left ledger readout), and it sits on the arc that closes the
+  // loop, reading as "just left update, carrying the outcome back to signal".
+  const t = rest ? (N - 1) / N + 0.3 / N : idx / N;
   const tok = ringPoint(t);
   const redPath = ci === 'red' && redResolved;
 
@@ -391,6 +396,7 @@ export default function P01() {
   // ledger full, the loop visibly closed.
   const [idx, setIdx] = useState(N - 1);
   const [playing, setPlaying] = useState(false);
+  const [touched, setTouched] = useState(false);
   const [committed, setCommitted] = useState(null);
 
   const trace = ci === 'red' ? RED : GREEN;
@@ -413,8 +419,12 @@ export default function P01() {
     return () => clearTimeout(tmr);
   }, [playing, reduced, idx, last]);
 
-  const step = () => setIdx((i) => (i >= last ? 0 : i + 1));
+  const step = () => {
+    setTouched(true);
+    setIdx((i) => (i >= last ? 0 : i + 1));
+  };
   const run = () => {
+    setTouched(true);
     if (reduced) {
       setIdx(last);
       return;
@@ -423,6 +433,7 @@ export default function P01() {
     setPlaying(true);
   };
   const toggleCi = () => {
+    setTouched(true);
     setPlaying(false);
     setCi((c) => (c === 'green' ? 'red' : 'green'));
     setIdx(0);
@@ -434,7 +445,13 @@ export default function P01() {
   return (
     <Page n={1} claim="A loop is five stages that close.">
       <Activity>
-        <LoopCircuit idx={idx} ci={idx >= 2 ? ci : null} ledger={ledger} redResolved={idx >= 3} />
+        <LoopCircuit
+          idx={idx}
+          ci={idx >= 2 ? ci : null}
+          ledger={ledger}
+          redResolved={idx >= 3}
+          rest={!touched && idx >= last}
+        />
 
         <p
           className="mono"

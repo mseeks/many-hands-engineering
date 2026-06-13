@@ -832,13 +832,10 @@ export default function P13() {
             </div>
           </div>
 
-          <Walkthrough
-            trace={BET_TRACE}
-            renderStep={(stepObj) => {
-              const idx = BET_TRACE.steps.indexOf(stepObj);
-              return <LadderChart reveal={STEP_REACH[idx] ?? 12} ghost={ghost} />;
-            }}
-          />
+          {/* The full bet curve, drawn at rest so the payoff lands on load.
+              The stage-by-stage replay lives in the fold below, where the
+              same chart reveals stepwise. */}
+          <LadderChart reveal={12} ghost={ghost} />
 
           <div className="mh-readout" data-testid="ladder-readout" style={{ marginTop: 4 }}>
             <Stat
@@ -884,6 +881,21 @@ export default function P13() {
         Capacity is a count of simple loops, not the depth of one — a dozen that compound beat one
         that is clever, and the ladder is what makes the dozen cheap.
       </Takeaway>
+
+      <Deeper title="Stage by stage (§3.4)">
+        <p style={{ margin: '0 0 10px', fontSize: '14px', color: 'var(--ink-2)' }}>
+          The same bet, walked. Step the recorded run and the curve reveals one stretch at a time —
+          Stage 0&apos;s instrumentation weeks, the first loops closing, coordination arriving, then
+          the autonomy drill. The ghost toggle above carries into the replay.
+        </p>
+        <Walkthrough
+          trace={BET_TRACE}
+          renderStep={(stepObj) => {
+            const idx = BET_TRACE.steps.indexOf(stepObj);
+            return <LadderChart reveal={STEP_REACH[idx] ?? 12} ghost={ghost} />;
+          }}
+        />
+      </Deeper>
 
       <Deeper title="The catalog, in full (§3.3)">
         <p style={{ margin: '0 0 10px', fontSize: '14px', color: 'var(--ink-2)' }}>

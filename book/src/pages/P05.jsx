@@ -154,6 +154,11 @@ const tileCenter = (i) => {
 /** Heat 0..1 for a region's signal. */
 const heatOf = (signal) => Math.min(1, signal / HEAT_CAP);
 
+// Hot tiles fill with the amber cast (theme-independent), so their text must be
+// a dark ink to clear WCAG AA in both themes. White-on-amber fails for small
+// text. The cool branch stays on the theme ink tokens.
+const HOT_INK = 'rgba(20, 18, 12, 0.82)';
+
 function FieldScene({ field, lockIn, agents, brightestId }) {
   const total = sumSignal(field);
   const brightest = field.nodes.find((n) => n.id === brightestId) ?? field.nodes[0];
@@ -194,9 +199,10 @@ function FieldScene({ field, lockIn, agents, brightestId }) {
             <text
               x={x + 8}
               y={y + 18}
-              fontSize="11"
+              fontSize="12"
+              fontWeight={hot ? '600' : '400'}
               fontFamily="var(--font-mono)"
-              fill={hot ? 'var(--paper)' : 'var(--ink-2)'}
+              fill={hot ? HOT_INK : 'var(--ink-2)'}
               style={{ transition: 'fill 240ms ease' }}
             >
               {n.name}
@@ -207,7 +213,7 @@ function FieldScene({ field, lockIn, agents, brightestId }) {
               fontSize="15"
               fontWeight="700"
               fontFamily="var(--font-mono)"
-              fill={hot ? 'var(--paper)' : 'var(--ink)'}
+              fill={hot ? HOT_INK : 'var(--ink)'}
               style={{ transition: 'fill 240ms ease' }}
             >
               {n.signal.toFixed(2)}
@@ -282,7 +288,7 @@ const GLASS = [
 
 export default function P05() {
   const reduced = usePrefersReducedMotion();
-  const [taskId, setTaskId] = useState('saturate');
+  const [taskId, setTaskId] = useState('flip');
   const [knobs, setKnobs] = useState(() =>
     Object.fromEntries(TASK_IDS.map((id) => [id, TASKS[id].preload])),
   );
@@ -383,6 +389,13 @@ export default function P05() {
           agents={agents}
           brightestId={brightestId}
         />
+
+        <p
+          className="mono"
+          style={{ fontSize: '10.5px', color: 'var(--ink-faint)', margin: '6px 0 0' }}
+        >
+          green dots = agents following the heat; no router assigns them
+        </p>
 
         <Readouts metrics={metrics} total={total} />
 

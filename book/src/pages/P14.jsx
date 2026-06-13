@@ -17,7 +17,7 @@
 // metrics gaming can't also inflate — and exposes that deep review endorses
 // only ~81% of it. The gate alone cannot see that.
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Page, Activity, Seen, Takeaway, Deeper } from '../components/page.jsx';
 import { Badge, ModelNotes, glassSlice } from '../components/kit.jsx';
 import { simulateWeeks, defaultClasses } from '../engine/econ.js';
@@ -42,6 +42,22 @@ const CAST = {
 
 const pct = (x) => (x == null ? '—' : `${(x * 100).toFixed(1)}%`);
 const fmt1 = (x) => (Number.isInteger(x) ? String(x) : x.toFixed(1));
+
+// Below this width the gate console's 5-column grid can't fit the gate pill, so
+// each row collapses to a stacked card. matchMedia mirrors usePrefersReducedMotion.
+const NARROW = '(max-width: 560px)';
+function useNarrow() {
+  const [narrow, setNarrow] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(NARROW).matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(NARROW);
+    const onChange = () => setNarrow(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return narrow;
+}
 
 /** Gated demand a class places on the budget given its gate side. */
 function classLoad(c) {
@@ -412,7 +428,64 @@ const SAFEST_OPTIONS = [
 
 /* ── The console rows ──────────────────────────────────────────────────── */
 
-function ClassRow({ c, rate, onToggle }) {
+function ClassRow({ c, rate, onToggle, narrow }) {
+  const dot = (
+    <span
+      aria-hidden="true"
+      style={{ width: 10, height: 10, borderRadius: 3, background: CAST[c.id] }}
+    />
+  );
+  const label = <span style={{ fontWeight: 500 }}>{c.label}</span>;
+  const inflow = (
+    <span className="mono" style={{ color: 'var(--ink-faint)' }}>
+      {c.inflow}/wk
+    </span>
+  );
+  const approves = (
+    <span className="mono" style={{ color: 'var(--ink-2)', minWidth: 52, textAlign: 'right' }}>
+      {pct(rate)}
+    </span>
+  );
+  const gate = (
+    <button
+      type="button"
+      className="mh-chip"
+      aria-pressed={c.gate === 'below'}
+      data-testid={`gate-${c.id}`}
+      onClick={() => onToggle(c.id)}
+      style={{ minWidth: 132 }}
+    >
+      {c.gate === 'above' ? 'above gate — steward' : 'below gate — sampled'}
+    </button>
+  );
+
+  // Below 560px the 5-column grid can't hold the gate pill, so stack: label on
+  // line 1, then inflow / approves / gate on line 2 — nothing overruns.
+  if (narrow) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+          padding: '10px',
+          borderBottom: '1px solid var(--line-soft)',
+          fontSize: 13.5,
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {dot}
+          {label}
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          {inflow}
+          {approves}
+          {gate}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -425,27 +498,11 @@ function ClassRow({ c, rate, onToggle }) {
         fontSize: 13.5,
       }}
     >
-      <span
-        aria-hidden="true"
-        style={{ width: 10, height: 10, borderRadius: 3, background: CAST[c.id] }}
-      />
-      <span style={{ fontWeight: 500 }}>{c.label}</span>
-      <span className="mono" style={{ color: 'var(--ink-faint)' }}>
-        {c.inflow}/wk
-      </span>
-      <span className="mono" style={{ color: 'var(--ink-2)', minWidth: 52, textAlign: 'right' }}>
-        {pct(rate)}
-      </span>
-      <button
-        type="button"
-        className="mh-chip"
-        aria-pressed={c.gate === 'below'}
-        data-testid={`gate-${c.id}`}
-        onClick={() => onToggle(c.id)}
-        style={{ minWidth: 132 }}
-      >
-        {c.gate === 'above' ? 'above gate — steward' : 'below gate — sampled'}
-      </button>
+      {dot}
+      {label}
+      {inflow}
+      {approves}
+      {gate}
     </div>
   );
 }
@@ -455,6 +512,7 @@ function ClassRow({ c, rate, onToggle }) {
 export default function P14() {
   const [classes, setClasses] = useState(defaultClasses);
   const [picked, setPicked] = useState(null);
+  const narrow = useNarrow();
 
   const run = useMemo(
     () => simulateWeeks({ classes, budget: BUDGET, seed: SEED, tolerance: TOLERANCE }),
@@ -493,26 +551,30 @@ export default function P14() {
           role="group"
           aria-label="Gate console"
         >
-          <div
-            className="mono"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '12px 1fr auto auto auto',
-              gap: 12,
-              padding: '8px 10px 6px',
-              fontSize: 10.5,
-              color: 'var(--ink-faint)',
-              borderBottom: '1px solid var(--line-soft)',
-            }}
-          >
-            <span />
-            <span>class</span>
-            <span>inflow</span>
-            <span style={{ textAlign: 'right' }}>approves</span>
-            <span style={{ textAlign: 'center' }}>gate</span>
-          </div>
+          {/* The grid-aligned column header only makes sense for the 5-column
+              row layout; when rows stack, it would float over nothing. */}
+          {narrow ? null : (
+            <div
+              className="mono"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '12px 1fr auto auto auto',
+                gap: 12,
+                padding: '8px 10px 6px',
+                fontSize: 10.5,
+                color: 'var(--ink-faint)',
+                borderBottom: '1px solid var(--line-soft)',
+              }}
+            >
+              <span />
+              <span>class</span>
+              <span>inflow</span>
+              <span style={{ textAlign: 'right' }}>approves</span>
+              <span style={{ textAlign: 'center' }}>gate</span>
+            </div>
+          )}
           {classes.map((c) => (
-            <ClassRow key={c.id} c={c} rate={rateOf(c.id)} onToggle={toggle} />
+            <ClassRow key={c.id} c={c} rate={rateOf(c.id)} onToggle={toggle} narrow={narrow} />
           ))}
           <div className="mh-slider" style={{ padding: '10px 12px 12px' }}>
             <label htmlFor="p14-budget">

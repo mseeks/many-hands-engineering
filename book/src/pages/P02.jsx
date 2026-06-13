@@ -24,21 +24,24 @@ const eventById = new Map(events.map((e) => [e.id, e]));
 // ── Geometry ───────────────────────────────────────────────────────────
 // One viewBox the SVG scales to fill the Activity width. Loop anchors ring a
 // central terrain panel; each artifact's first-written tile gets a fixed slot.
-const VB = { w: 760, h: 470 };
-const TERRAIN = { x: 250, y: 64, w: 260, h: 366 };
+const VB = { w: 760, h: 392 };
+// The panel wraps the trimmed tile grid: 4 rows + a top band for the terrain
+// actor's dock and the title, recentred against the ring of loop glyphs.
+const TILE_TOP = 30; // tile grid's inset below the panel's top edge
+const TERRAIN = { x: 250, y: 132, w: 260, h: 222 };
 
 // Loop glyph anchors — the docking point arrows touch. dead-code appears twice
 // in the cast but is one loop with one node.
 const LOOP_NODES = {
-  'dep-patch': { x: 120, y: 120, side: 'right' },
-  'flaky-test': { x: 120, y: 250, side: 'right' },
-  triage: { x: 120, y: 380, side: 'right' },
-  'dead-code': { x: 640, y: 130, side: 'left' },
-  'doc-refresh': { x: 640, y: 320, side: 'left' },
+  'dep-patch': { x: 120, y: 162, side: 'right' },
+  'flaky-test': { x: 120, y: 243, side: 'right' },
+  triage: { x: 120, y: 324, side: 'right' },
+  'dead-code': { x: 640, y: 190, side: 'left' },
+  'doc-refresh': { x: 640, y: 300, side: 'left' },
   // The terrain actor (nightly registry sync + the CI oracle) is ground, not a
   // loop — it writes signals too, so it gets a docking node up top, seated over
   // the signal tiles it owns rather than across the panel title.
-  terrain: { x: 380, y: 24, side: 'down' },
+  terrain: { x: 380, y: 92, side: 'down' },
 };
 // Where the terrain-actor band's arrows dock onto the panel: the top edge,
 // above its own signal tiles, clear of the centered title.
@@ -52,31 +55,28 @@ const LOOP_META = {
   terrain: { name: 'registry sync · CI oracle', color: 'var(--ink-faint)' },
 };
 
-// Each artifact's tile lives at a fixed slot inside the terrain panel. The
-// first event to write an artifact owns its tile; reads point back to it.
+// Each artifact's tile lives at a fixed slot inside the terrain panel. Only
+// the tiles a backward walk can actually reach are drawn — every artifact
+// here is read by some event, so an arrow can dock on it. Write-only
+// artifacts (a closed branch, a ledger row nothing reads back) are left out:
+// they would sit dark forever and only crowd the panel.
 const TILE_ORDER = [
   ['signals/deps.outdated', 'deps.outdated', 'sig-zod-patch'],
+  ['repo/pr-481', 'pr #481', 'dp-open'],
   ['signals/ci.status/pr-481', 'ci.status #481', 'ci-pr481'],
   ['signals/ci.flakiness', 'ci.flakiness', 'ci-pr481'],
-  ['repo/pr-481', 'pr #481', 'dp-open'],
-  ['repo/branch/deps-zod-3.24.2', 'branch zod', 'dp-open'],
   ['repo/main', 'main', 'dp-merge'],
   ['signals/docs.freshness', 'docs.freshness', 'dp-merge'],
   ['signals/deadness', 'deadness', 'graph-scan'],
   ['signals/queue.ranked', 'queue.ranked', 'triage-rank'],
-  ['ledger/patch-bump', 'ledger: bump', 'dp-merge'],
-  ['repo/pr-482', 'pr #482', 'ft-fix'],
-  ['repo/pr-487', 'pr #487', 'dc-propose'],
-  ['repo/pr-488', 'pr #488', 'dr-rewrite'],
-  ['ledger/dead-code', 'ledger: remove', 'dc-removal-merge'],
 ];
-const TILE = { w: 116, h: 23, gap: 2.6 };
+const TILE = { w: 116, h: 30, gap: 12 };
 const tileAt = (i) => {
   const col = i % 2;
   const row = Math.floor(i / 2);
   return {
     x: TERRAIN.x + 10 + col * (TILE.w + 8),
-    y: TERRAIN.y + 12 + row * (TILE.h + TILE.gap),
+    y: TERRAIN.y + TILE_TOP + row * (TILE.h + TILE.gap),
     w: TILE.w,
     h: TILE.h,
   };
@@ -157,11 +157,11 @@ function Scene({ chain, selectedId }) {
 
   return (
     <svg
-      viewBox={`0 0 ${VB.w} ${VB.h}`}
+      viewBox={`0 55 ${VB.w} ${VB.h - 55}`}
       width="100%"
       role="img"
       aria-label={`Coordination map for ${selectedId}: every traced hop is a read or a write of a terrain tile; no arrow connects two loops.`}
-      style={{ display: 'block', maxHeight: 460 }}
+      style={{ display: 'block', maxHeight: 420 }}
     >
       <defs>
         <marker
@@ -290,54 +290,45 @@ function Scene({ chain, selectedId }) {
         );
       })}
 
-      {/* the hops — paired READ/WRITE arrows, drawn last so they glow on top */}
-      {arrows.map((a) => {
-        // Seat the label toward the loop end (READ ends at the loop, WRITE
-        // starts there) so labels fan out over the open ring, not the crowded
-        // terrain edge. t=0 is the tile side, t=1 the loop side.
-        const t = a.kind === 'READ' ? 0.66 : 0.34;
-        const mx = a.x1 + (a.x2 - a.x1) * t;
-        const my = a.y1 + (a.y2 - a.y1) * t;
-        return (
-          <g key={a.key} style={{ transition: 'opacity .2s ease' }}>
-            <line
-              x1={a.x1}
-              y1={a.y1}
-              x2={a.x2}
-              y2={a.y2}
-              stroke={a.color}
-              strokeWidth="2.2"
-              strokeDasharray={a.kind === 'READ' ? '5 4' : undefined}
-              markerEnd="url(#p02-head)"
-              opacity="0.92"
-              style={{ filter: `drop-shadow(0 0 3px ${a.color})` }}
-            />
-            <rect
-              x={mx - 17}
-              y={my - 8}
-              width="34"
-              height="14"
-              rx="3"
-              fill="var(--paper)"
-              stroke={a.color}
-              strokeWidth="0.8"
-              opacity="0.96"
-            />
-            <text
-              x={mx}
-              y={my + 2.5}
-              textAnchor="middle"
-              fontSize="8.5"
-              letterSpacing="0.06em"
-              fontWeight="700"
-              fill="var(--ink)"
-              fontFamily="var(--font-mono)"
-            >
-              {a.kind}
-            </text>
-          </g>
-        );
-      })}
+      {/* the hops — paired READ/WRITE arrows, drawn last so they glow on top.
+          The kind is carried by the line style (dashed READ, solid WRITE), not
+          a label box per arrow: stacking sixteen tiny labels at the docks was
+          the whole tangle. One legend reads them all. */}
+      {arrows.map((a) => (
+        <line
+          key={a.key}
+          x1={a.x1}
+          y1={a.y1}
+          x2={a.x2}
+          y2={a.y2}
+          stroke={a.color}
+          strokeWidth="2.6"
+          strokeDasharray={a.kind === 'READ' ? '5 5' : undefined}
+          markerEnd="url(#p02-head)"
+          opacity="0.92"
+          style={{ filter: `drop-shadow(0 0 2px ${a.color})`, transition: 'opacity .2s ease' }}
+        />
+      ))}
+
+      {/* one legend for both arrow kinds, seated in the open lower-left */}
+      <g fontFamily="var(--font-mono)" fontSize="10" fill="var(--ink-2)">
+        <line
+          x1="40"
+          y1="368"
+          x2="70"
+          y2="368"
+          stroke="var(--ink-2)"
+          strokeWidth="2.4"
+          strokeDasharray="5 5"
+        />
+        <text x="76" y="371.5">
+          a loop READS
+        </text>
+        <line x1="40" y1="384" x2="70" y2="384" stroke="var(--ink-2)" strokeWidth="2.4" />
+        <text x="76" y="387.5">
+          a loop WROTE
+        </text>
+      </g>
     </svg>
   );
 }
@@ -404,7 +395,7 @@ export default function P02() {
             <>
               {DECIDER_FEEDBACK[picked]}
               <p style={{ margin: '8px 0 0' }}>
-                Now check it on the map: pick any outcome and watch its chain draw backward.
+                Check it on the map: pick any outcome, watch its chain draw backward.
               </p>
             </>
           )}
@@ -412,21 +403,26 @@ export default function P02() {
 
         <Scene chain={chain} selectedId={selectedId} />
 
-        <div className="mh-readout" aria-live="polite" style={{ justifyContent: 'center' }}>
-          <div className="mh-stat">
-            <span className="k">READ arrows</span>
-            <span className="v">{readCount}</span>
-          </div>
-          <div className="mh-stat">
-            <span className="k">WRITE arrows</span>
+        <div
+          className="mh-readout"
+          aria-live="polite"
+          style={{ justifyContent: 'center', alignItems: 'center', gap: 36 }}
+        >
+          <div className="mh-stat" title="Each hop is one loop reading a tile another loop wrote.">
+            <span className="k">read↔write edges</span>
             <span className="v">{readCount}</span>
           </div>
           <div
             className="mh-stat"
             title="CALL is not a hop kind this history can draw — the point."
+            style={{ textAlign: 'center' }}
           >
-            <span className="k">CALL arrows</span>
-            <span className="v good">0</span>
+            <span className="k" style={{ fontSize: 12 }}>
+              call arrows
+            </span>
+            <span className="v good" style={{ fontSize: 34, fontWeight: 700, lineHeight: 1 }}>
+              0
+            </span>
           </div>
         </div>
 
@@ -488,13 +484,13 @@ export default function P02() {
       </Activity>
 
       <Seen>
-        Every traced hop is a loop reading a terrain tile and a loop having written it. No arrow
-        ever joins two loops, because the data has no way to draw a call.
+        Every hop is a loop reading a tile and a loop having written it. No arrow joins two loops:
+        the data has no way to draw a call.
       </Seen>
 
       <Takeaway>
-        Stop hunting the orchestrator. The coordinator you keep reaching for is the terrain itself —
-        and it scales because shared state costs N channels where direct messaging costs N².
+        Stop hunting the orchestrator. The coordinator is the terrain itself — and it scales because
+        shared state costs N channels where direct messaging costs N².
       </Takeaway>
 
       <Deeper title="Why shared-environment coordination scales (§2.8)">
