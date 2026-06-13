@@ -1,15 +1,15 @@
-// Visual review harness: builds nothing, drives a running preview server, and
-// captures every chapter in both themes (plus a mobile pass on key chapters).
+// Visual review harness: drives a running preview server and captures every
+// page in both themes (plus a mobile pass on key pages).
 // Usage:  npm run build && npm run preview &   then:  npm run shoot
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
-import { CHAPTERS } from '../src/chapters/registry.js';
+import { PAGES } from '../src/pages/registry.js';
 
-const BASE = process.env.SHOOT_BASE || 'http://127.0.0.1:5199/';
+const BASE = process.env.SHOOT_BASE || 'http://localhost:5199/';
 const OUT = new URL('../shots/', import.meta.url).pathname;
 mkdirSync(OUT, { recursive: true });
 
-const MOBILE_CHAPTERS = [0, 1, 5, 9, 18, 22];
+const MOBILE_PAGES = [0, 1, 4, 6, 14, 17];
 
 const browser = await chromium.launch();
 for (const theme of ['dark', 'light']) {
@@ -18,13 +18,13 @@ for (const theme of ['dark', 'light']) {
   const page = await ctx.newPage();
   const errors = [];
   page.on('console', (msg) => {
-    if (msg.type() === 'error') errors.push(`[ch?] ${msg.text()}`);
+    if (msg.type() === 'error') errors.push(msg.text());
   });
-  for (const ch of CHAPTERS) {
-    await page.goto(`${BASE}#ch-${ch.n}`, { waitUntil: 'networkidle' });
-    await page.waitForTimeout(900);
-    const n = String(ch.n).padStart(2, '0');
-    await page.screenshot({ path: `${OUT}ch-${n}-${theme}.png`, fullPage: false });
+  for (const p of PAGES) {
+    await page.goto(`${BASE}#p-${p.n}`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(800);
+    const n = String(p.n).padStart(2, '0');
+    await page.screenshot({ path: `${OUT}p-${n}-${theme}.png`, fullPage: true });
   }
   if (errors.length) {
     console.log(`console errors (${theme}):`);
@@ -35,11 +35,11 @@ for (const theme of ['dark', 'light']) {
 
 const mob = await browser.newContext({ viewport: { width: 375, height: 812 } });
 const mpage = await mob.newPage();
-for (const n of MOBILE_CHAPTERS) {
-  await mpage.goto(`${BASE}#ch-${n}`, { waitUntil: 'networkidle' });
-  await mpage.waitForTimeout(700);
+for (const n of MOBILE_PAGES) {
+  await mpage.goto(`${BASE}#p-${n}`, { waitUntil: 'networkidle' });
+  await mpage.waitForTimeout(600);
   await mpage.screenshot({
-    path: `${OUT}ch-${String(n).padStart(2, '0')}-mobile.png`,
+    path: `${OUT}p-${String(n).padStart(2, '0')}-mobile.png`,
     fullPage: false,
   });
 }

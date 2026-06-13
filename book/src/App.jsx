@@ -1,15 +1,15 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ACTS, CHAPTERS, actOfChapter, chaptersInAct, totalMinutes } from './chapters/registry.js';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { GROUPS, PAGES, pageByN, pagesInGroup, totalMinutes } from './pages/registry.js';
 
-// One chunk per act so the book's first paint stays light.
-const actModule = (k) => lazy(() => import(`./chapters/act${k}/index.jsx`));
-const ACT_COMPONENTS = ACTS.map((a) => actModule(a.act));
+// One chunk per page; a page is one screen with one activity.
+const pageModule = (n) => lazy(() => import(`./pages/P${String(n).padStart(2, '0')}.jsx`));
+const PAGE_COMPONENTS = PAGES.map((p) => pageModule(p.n));
 
-function chapterFromHash() {
-  const m = window.location.hash.match(/ch-(\d+)/);
+function pageFromHash() {
+  const m = window.location.hash.match(/p-(\d+)/);
   if (!m) return 0;
   const n = Number(m[1]);
-  return CHAPTERS.some((ch) => ch.n === n) ? n : 0;
+  return PAGES.some((p) => p.n === n) ? n : 0;
 }
 
 function useTheme() {
@@ -33,7 +33,7 @@ function useTheme() {
       if (pick === 'system') localStorage.removeItem('mh-theme');
       else localStorage.setItem('mh-theme', pick);
     } catch {
-      /* private browsing: theme just doesn't persist */
+      /* private browsing: the pick just doesn't persist */
     }
     return () => mq.removeEventListener('change', apply);
   }, [pick]);
@@ -42,46 +42,29 @@ function useTheme() {
   return [pick, cycle];
 }
 
-function useReadingProgress() {
-  const [pct, setPct] = useState(0);
-  useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const el = document.documentElement;
-        const max = el.scrollHeight - el.clientHeight;
-        setPct(max > 0 ? Math.min(100, Math.round((el.scrollTop / max) * 100)) : 0);
-      });
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-  return pct;
-}
-
 export default function App() {
-  const [activeChapter, setActiveChapter] = useState(chapterFromHash);
+  const [active, setActive] = useState(pageFromHash);
   const [navOpen, setNavOpen] = useState(false);
   const [pick, cycleTheme] = useTheme();
-  const progress = useReadingProgress();
-  const mainRef = useRef(null);
-  const activeAct = actOfChapter(activeChapter);
-  const ActBody = ACT_COMPONENTS[activeAct];
+  const meta = pageByN(active);
+  const Body = PAGE_COMPONENTS[active];
 
   const go = useCallback((n) => {
-    setActiveChapter(n);
+    setActive(n);
     setNavOpen(false);
-    window.history.pushState(null, '', `#ch-${n}`);
+    window.history.pushState(null, '', `#p-${n}`);
+    window.scrollTo({ top: 0 });
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`p-${n}`);
+      if (el) el.focus({ preventScroll: true });
+    });
   }, []);
 
-  // Browser back/forward: the hash is the single source of truth.
   useEffect(() => {
-    const onPop = () => setActiveChapter(chapterFromHash());
+    const onPop = () => {
+      setActive(pageFromHash());
+      window.scrollTo({ top: 0 });
+    };
     window.addEventListener('popstate', onPop);
     window.addEventListener('hashchange', onPop);
     return () => {
@@ -90,110 +73,66 @@ export default function App() {
     };
   }, []);
 
-  // After the act mounts, land on the requested chapter.
   useEffect(() => {
-    const id = `ch-${activeChapter}`;
-    let tries = 0;
-    const seek = () => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ block: 'start' });
-        el.focus({ preventScroll: true });
-      } else if (tries++ < 40) {
-        setTimeout(seek, 50);
-      }
-    };
-    seek();
-  }, [activeChapter, activeAct]);
-
-  // While the reader scrolls inside an act, keep the rail and hash current.
-  useEffect(() => {
-    const sections = Array.from(document.querySelectorAll('.mh-chapter'));
-    if (!sections.length || !('IntersectionObserver' in window)) return undefined;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const hit = entries.find((e) => e.isIntersecting);
-        if (!hit) return;
-        const n = Number(hit.target.id.replace('ch-', ''));
-        if (!Number.isNaN(n)) {
-          setActiveChapter((prev) => (prev === n ? prev : n));
-          window.history.replaceState(null, '', `#ch-${n}`);
-        }
-      },
-      { rootMargin: '-40% 0px -55% 0px' },
-    );
-    sections.forEach((s) => io.observe(s));
-    return () => io.disconnect();
-  }, [activeAct]);
-
-  const doc = useMemo(() => CHAPTERS.find((c) => c.n === activeChapter), [activeChapter]);
-  useEffect(() => {
-    document.title = doc ? `${doc.title} · Many Hands` : 'Many Hands — the handbook, run';
-  }, [doc]);
-
-  const hours = Math.floor(totalMinutes / 60);
-  const mins = totalMinutes % 60;
+    document.title = meta ? `${meta.title} · Many Hands` : 'Many Hands';
+  }, [meta]);
 
   return (
     <div className="mh-root">
-      <div className="mh-progress" aria-hidden="true">
-        <div className="mh-progress-fill" style={{ width: `${progress}%` }} />
-      </div>
-
       <header className="mh-topbar">
         <button
           type="button"
-          className="mh-nav-toggle"
+          className="mh-ghostbtn mh-nav-toggle"
           aria-expanded={navOpen}
           aria-controls="mh-rail"
           onClick={() => setNavOpen((v) => !v)}
         >
           Contents
         </button>
-        <a className="mh-wordmark" href="#ch-0" onClick={() => go(0)}>
+        <a
+          className="mh-wordmark"
+          href="#p-0"
+          onClick={(e) => {
+            e.preventDefault();
+            go(0);
+          }}
+        >
           Many Hands
         </a>
+        <span className="mh-topbar-pos mono">
+          {String(active).padStart(2, '0')} / {PAGES.length - 1}
+        </span>
         <button
           type="button"
-          className="mh-theme-toggle"
+          className="mh-ghostbtn"
           onClick={cycleTheme}
           aria-label={`Theme: ${pick}. Activate to change.`}
         >
-          {pick === 'system' ? 'System' : pick === 'light' ? 'Light' : 'Dark'}
+          {pick === 'system' ? 'Auto' : pick === 'light' ? 'Light' : 'Dark'}
         </button>
       </header>
 
-      <nav id="mh-rail" className={`mh-rail${navOpen ? ' open' : ''}`} aria-label="Chapters">
-        <div className="mh-rail-head">
-          <span className="mh-eyebrow">Sullivan · 2026 · The handbook, run</span>
-          <span className="mh-rail-total">
-            {hours}h{mins ? ` ${mins}m` : ''} · ⚡ marks the fast path
-          </span>
-        </div>
-        {ACTS.map((a) => (
-          <div key={a.act} className="mh-rail-act">
-            <div className="mh-rail-act-title">
-              <span className="mh-rail-act-num">Act {['0', 'I', 'II', 'III', 'IV'][a.act]}</span>
-              {a.title}
-            </div>
+      <nav id="mh-rail" className={`mh-rail${navOpen ? ' open' : ''}`} aria-label="Pages">
+        <p className="mh-rail-head mono">
+          The handbook, run · ~{Math.round(totalMinutes / 5) * 5} min
+        </p>
+        {GROUPS.map((g) => (
+          <div key={g.id} className="mh-rail-group">
+            <p className="mh-rail-group-title mono">{g.title}</p>
             <ul>
-              {chaptersInAct(a.act).map((ch) => (
-                <li key={ch.n}>
+              {pagesInGroup(g.id).map((p) => (
+                <li key={p.n}>
                   <a
-                    href={`#ch-${ch.n}`}
-                    aria-current={ch.n === activeChapter ? 'true' : undefined}
-                    className={ch.n === activeChapter ? 'active' : ''}
+                    href={`#p-${p.n}`}
+                    aria-current={p.n === active ? 'true' : undefined}
+                    className={p.n === active ? 'active' : ''}
                     onClick={(e) => {
                       e.preventDefault();
-                      go(ch.n);
+                      go(p.n);
                     }}
                   >
-                    <span className="mh-rail-n">{ch.n}</span>
-                    <span className="mh-rail-title">{ch.title}</span>
-                    <span className="mh-rail-min">
-                      {ch.fast ? '⚡' : ''}
-                      {ch.minutes}m
-                    </span>
+                    <span className="mono mh-rail-n">{String(p.n).padStart(2, '0')}</span>
+                    <span>{p.title}</span>
                   </a>
                 </li>
               ))}
@@ -202,49 +141,27 @@ export default function App() {
         ))}
       </nav>
 
-      <main ref={mainRef} className="mh-main" aria-label={doc ? doc.title : 'Many Hands'}>
-        <Suspense fallback={<div className="mh-loading">Setting the bench…</div>}>
-          <ActBody />
+      <main className="mh-main">
+        <Suspense fallback={<div className="mh-loading mono">setting the bench…</div>}>
+          <Body />
         </Suspense>
-        <footer className="mh-footer">
-          <ActFooter act={activeAct} onGo={go} />
-        </footer>
+        <nav className="mh-pagenav" aria-label="Previous and next page">
+          {active > 0 ? (
+            <button type="button" className="mh-btn" onClick={() => go(active - 1)}>
+              ← {pageByN(active - 1).title}
+            </button>
+          ) : (
+            <span />
+          )}
+          {active < PAGES.length - 1 ? (
+            <button type="button" className="mh-btn mh-btn-primary" onClick={() => go(active + 1)}>
+              {pageByN(active + 1).title} →
+            </button>
+          ) : (
+            <span />
+          )}
+        </nav>
       </main>
-    </div>
-  );
-}
-
-function ActFooter({ act, onGo }) {
-  const prev = act > 0 ? chaptersInAct(act - 1).at(-1) : null;
-  const next = act < ACTS.length - 1 ? chaptersInAct(act + 1)[0] : null;
-  return (
-    <div className="mh-actnav">
-      {prev ? (
-        <a
-          href={`#ch-${prev.n}`}
-          onClick={(e) => {
-            e.preventDefault();
-            onGo(prev.n);
-          }}
-        >
-          ← {ACTS[act - 1].title}
-        </a>
-      ) : (
-        <span />
-      )}
-      {next ? (
-        <a
-          href={`#ch-${next.n}`}
-          onClick={(e) => {
-            e.preventDefault();
-            onGo(next.n);
-          }}
-        >
-          {ACTS[act + 1].title} →
-        </a>
-      ) : (
-        <span />
-      )}
     </div>
   );
 }
