@@ -743,7 +743,7 @@ Throughout this part, I use a single concrete example: the *dependency-patch loo
 #quote(block: true)[
   A signal watches the dependency graph for available patch-level upgrades with clean changelogs. When one appears, an agent opens a change with the upgrade and the quoted changelog. Continuous integration (CI) runs. If CI passes, the change merges. If CI fails, the change stays open for human review. In either case, the agent's track record on this task class updates.
 
-  Signals produced: patch cadence, CI pass rate, and post-merge rollback rate. All three feed two things: how aggressively the next patch is applied, and whether this agent has earned autonomy on this task class.
+  Signals produced: patch cadence, CI pass rate, and post-merge rollback rate. All three inform how aggressively the next patch is applied, and whether this agent has earned autonomy on this task class.
 ]
 
 It is a loop. It has a placement: it is reversible, legible, and loosely coupled, so it is emergent work. It has a boundary: CI is a gate, and the human reviewer is a higher gate. It has a steward: the person who sets the thresholds. It has trust that is earned and revocable. We return to this example throughout this part.
@@ -795,7 +795,7 @@ Every loop, from the smallest to the largest, has the same anatomy: five stages 
 
 #v(0.4em)
 
-A loop is healthy when all five stages exist, are bounded in time and scope, and close. A loop closes when the outcome (pass or fail) returns to the terrain as a signal that the next loop can read. Loops that do not close are not loops. They are fire-and-forget scripts that accumulate debt.
+A loop is healthy when all five stages exist and are bounded in time and scope, and when the loop closes. A loop closes when the outcome (pass or fail) returns to the terrain as a signal that the next loop can read. Loops that do not close are not loops. They are scripts that are started and then forgotten, and they accumulate debt.
 
 *Every loop needs six ingredients.* A loop that lacks any of them is not yet a loop. It is a script that still needs a home.
 
@@ -829,7 +829,7 @@ _A note on specifications, before the catalog._ Specifications are a tool that s
 
 Start here. Each starter loop has a clear trigger, a clear verification, and a cheap revert. The goal of the first loop is not the loop. The goal is the template.
 
-*Dependency-patch loop.* §3.1 and §3.2 describe this loop. It is the canonical starter loop.
+*Dependency-patch loop.* This loop is described in §3.1 and §3.2. It is the canonical starter loop.
 
 *Stale-doc refresh loop.* A signal on each documentation page records the _last code change in the covered area_ and the _last documentation update_. When the gap exceeds a threshold, an agent rewrites the page against the current code. The agent flags each sentence where it could not verify a claim. The change ships with a reviewer tagged from the code-ownership file. _Signal produced:_ a freshness field that decays with code changes and resets on review.
 
@@ -863,7 +863,7 @@ Attempt these loops only after the starter loops and the middle loops are durabl
 
 *Capacity-routing loop.* A meta-agent observes the approval rates per task class. It routes incoming work to the agent whose track record best matches the task. Agents that fail receive less work. Agents with a stronger track record receive more work within their task class. The steward sets the routing policy and the gate thresholds. _Signal produced:_ a per-agent specialization pattern that the team can read, reason about, and adjust.
 
-*Disturbance loop.* On a schedule, a deliberately disruptive agent introduces controlled stress into the terrain. The agent does one or more of these actions:
+*Disturbance loop.* On a schedule, a deliberately disruptive agent introduces controlled stress into the terrain in these ways:
 
 - It makes a normally available tool fail.
 - It removes a piece of context that other agents now rely on.
@@ -895,7 +895,7 @@ The transition that works proceeds in stages. Each stage makes the next stage po
   [*2. Replicate*], [Build more loops of the same shape. Do not broaden any one loop], [Platform capacity],
   [*3. Coordinate*], [Let loops interact through signals in the terrain], [Cross-loop coordination and guardrails],
   [*4. Plan*], [Introduce planners and routers that read the full signal field], [Higher-order agents],
-  [*5. Earn the approval*], [One task class at a time, move specific agent-task pairs from _propose_ to _auto-apply with sampling review_. An agent builds a track record to earn the approval on a narrow task class (see §3.6)], [Autonomy per agent and per task class],
+  [*5. Earn the approval*], [One task class at a time, move specific agent-task pairs from _propose_ to _auto-apply with sampling review_. An agent earns the approval on a narrow task class through a track record (see §3.6)], [Autonomy per agent and per task class],
   [*6. De-automate gracefully*], [Keep the ability to revoke an earned approval when a failure mode exceeds what that approval covers], [Durable reversibility],
 )
 
@@ -920,15 +920,15 @@ _The dependency-patch loop moves through these stages naturally:_
 The most persistent misconception about many-hands systems is that they reduce human involvement. They do not. They *reallocate* it. Human involvement moves from the high-volume, low-stakes middle to both ends. It moves upstream to the design of the conditions. It moves downstream to the adjudication of cases that exceed autonomy.
 
 - *Upstream: intent, taste, and the terrain itself.* Agents do not generate purpose. They pursue it. Someone decides what "good" means, where acceptable variance lies, and what the system is _for_. This work cannot be delegated, because it is the work that defines what delegation means.
-- *At pace-layer boundaries: codifying norms.* A convention is a useful pattern that agents imitate. When an agent practice consolidates into a convention, the steward notices it and ratifies it. The steward then promotes it from emergent practice to explicit rule. _This is how emergent work keeps each gain and moves forward. Without this step, it drifts nowhere._
+- *At pace-layer boundaries: codifying norms.* A convention is a useful pattern that agents imitate. When an agent practice consolidates into a convention, the steward notices it and ratifies it. The steward then promotes it from emergent practice to explicit rule. _This is how emergent work keeps each gain and moves forward. Without this step, it drifts with no direction._
 - *At boundaries: curating contracts.* Every interface between planned and emergent regions is a living contract. To maintain it, the steward must understand both sides, anticipate change in both, and make revisions that minimize breakage. Good curation is invisible. Poor curation is catastrophic.
 - *Downstream: adjudication.* The autonomy envelope is deliberately set so that some cases escalate. When they do, the steward's judgment defines how similar cases will be handled in the future.
 - *Periodically: deliberate disturbance.* The steward must keep the system honest about what it depends on. To do this, the steward schedules adversarial pressure (chaos days, removal experiments, red-team passes) even when nothing seems wrong. This matters _especially_ when nothing seems wrong. During months without disturbance, a system accumulates dependencies that the steward does not yet know about. (See §2.11.)
 - *Throughout: the veto on irreversible actions.* This veto applies to production deploys, data deletions, external calls with a cost, and legal commitments. The platform proposes. Only a human approves. This is not a position on the limits of AI. It is a position on the cost of being wrong.
 
-The shape of the steward's role is lower frequency and higher authority than the traditional engineering role. The steward takes fewer actions, and each action has more weight. If engineers in a mature platform execute more and decide less, the ratios are inverted.
+In shape, the steward's role is lower in frequency and higher in authority than the traditional engineering role. The steward takes fewer actions, and each action has more weight. If engineers in a mature platform find that they execute more and decide less, the ratios are inverted.
 
-The atomic unit of the steward's authority is the considered approval. It is not a rubber stamp, and it is not a reflex. It is the deliberate approval at the moments that matter. The upstream work supports it, and that work is what makes consideration possible at that moment. A steward who approves everything does not steward. A steward who approves nothing has not built the terrain that makes trust possible.
+The atomic unit of the steward's authority is the considered approval. It is not a rubber stamp, and it is not a reflex. It is the deliberate approval at the moments that matter. The upstream work supports it, and that work is what made consideration possible at those moments. A steward who approves everything does not steward. A steward who approves nothing has not built the terrain that makes trust possible.
 
 == What goes wrong with the human in the role
 
@@ -942,11 +942,11 @@ The steward's role is harder than it looks. The failures are well documented in 
 The defense is not willpower. The defense is terrain:
 
 - _Triangulation_ catches what a tired steward misses. It uses multiple metrics, sampled deep review, and adversarial probes.
-- _Rotation_ makes sure that no one person holds the role too long.
+- _Rotation_ makes sure that no single person holds the role too long.
 - _Practice cases_ keep skills current. The steward deliberately practices on hard examples even when none arrive.
 - _Time upstream_ makes the role sustainable. This is explicitly budgeted time for terrain design, not only for approval.
 
-The steward's job is to build a system in which the human in that system can succeed.
+The steward's job is to build a system where the human in it can succeed.
 
 = 3.6 — The economics of approval — gate, rate, budget
 
@@ -979,7 +979,7 @@ When inflow exceeds the budget, a queue forms. Queues produce one of two patholo
 
 The lever that stays constant is the budget. Stewards are not supposed to work harder. They are supposed to place the gates better.
 
-*Together, the three describe what it means operationally to "earn the approval".* To earn it, an agent produces proposals at a rate that is compatible with the budget. The agent does so with an approval rate that is high enough to justify a move of the gate. A move of the gate is not a decision made on feel. It is what happens when the numbers say that the gate belongs somewhere else.
+*Together, the three describe what it means operationally to "earn the approval".* To earn it, an agent produces proposals at a frequency that is compatible with the budget. The agent does so with an approval rate that is high enough to justify a move of the gate. A move of the gate is not a decision made on feel. It is what happens when the numbers say that the gate belongs somewhere else.
 
 *A concrete example.* A team of four engineers shares a steward role on a rotation. Each rotation gives the on-call steward a budget of roughly 30 considered approvals per week. That is enough to review carefully, and it does not consume the rest of the steward's attention. The dependency-patch loop generates 18 proposals a week, with a 96% approval rate over the last quarter. Of the 30-approval budget, this loop currently consumes 18. That is most of the budget on a single task class.
 
@@ -1080,7 +1080,7 @@ These cannot be measured. Attempts produce either superficial proxies (lines of 
 
 So far, the framework has been mostly about coordination, maintainability, and trust. Those are necessary, but they are not sufficient. A platform whose loops compound and whose commons stays clean can still ship code that does the wrong thing. It can also ship code that opens a hole that an attacker can use. _Authority answers who is allowed to do what. Correctness and security answer whether the completed work was right._
 
-There is a gap that honesty requires me to state. Birgitta Böckeler identified it in her early read of the OpenAI harness work, and it applies to this framework too. The gap is this: it is easier to specify how code is organized than whether the code does what users really need. Architectural rigor and functional correctness are different problems. The first yields to mechanical enforcement. The second requires deeper feedback between the system and the world that it claims to serve.
+One gap must be stated honestly. Birgitta Böckeler identified it in her early read of the OpenAI harness work, and it applies to this framework too. The gap is this: it is easier to specify how code is organized than whether the code does what users really need. Architectural rigor and functional correctness are different problems. The first yields to mechanical enforcement. The second requires deeper feedback between the system and the world that it claims to serve.
 
 *Three commitments belong in any serious many-hands platform.*
 
@@ -1117,7 +1117,7 @@ A framework that does not say where it does not apply has not earned its claims.
 - The team ships more than any individual reads.
 - The coordination across loops is the bottleneck.
 
-Both modes will coexist. A team that always works in the many-hands mode over-engineers. A team that never works in that mode loses compounding that it could have.
+Both modes will coexist. A team that always works in the many-hands mode over-engineers its work. A team that never works in that mode loses compounding that it could have.
 
 There is also a possible future that I want to acknowledge plainly. Single agents that are capable enough may eventually subsume some of what this framework addresses. If one sufficiently capable agent can hold the entire context, do the placement, run the loops, and exercise judgment, the multi-hand coordination layer becomes thinner.
 
@@ -1152,12 +1152,12 @@ This part gives the lineage, the mathematics, the evidence, and the open questio
 = 4.1 — Intellectual inheritance
 
 - *Biology and swarm intelligence.* Grassé coined _stigmergie_ in 1959 for termite construction. Theraulaz and Bonabeau formalized the mechanism. Dorigo's Ant Colony Optimization (from 1992) extracted it into a rigorous algorithmic framework. _The evidence is strong._
-- *Economics and distributed knowledge.* Hayek (1945) treats prices as compressed signals of dispersed knowledge. *Ostrom's #emph[Governing the Commons] (1990)* covers how decentralized institutions succeed where markets and central planning fail. _The evidence is strong: this is one of the most empirically grounded bodies of work in social science._
-- *Open source.* Raymond's _The Cathedral and the Bazaar_ (1997, 1999) is the origin of the vocabulary that this framework renames to planned/emergent. The change is mine. I made it because the new terms travel better across technical audiences and across the many applications of the planned/emergent distinction beyond open source itself. _The conceptual debt is total._
+- *Economics and distributed knowledge.* Hayek (1945) described prices as compressed signals of dispersed knowledge. *Ostrom's #emph[Governing the Commons] (1990)* covers how decentralized institutions succeed where markets and central planning fail. _The evidence is strong: this is one of the most empirically grounded bodies of work in social science._
+- *Open source.* Raymond's _The Cathedral and the Bazaar_ (1997, 1999) is the origin of the vocabulary that this framework renames to planned/emergent. The change is mine. I made it because the new terms travel better across technical audiences and across the many applications of the planned/emergent distinction beyond open source. _The conceptual debt is total._
 - *Organizations.* Conway (1968) stated that organizations ship their communication structure. Simon (1962) described near-decomposability. Brand (1994) described pace layering. _The evidence is strong across decades._
 - *Cybernetics.* Ashby (1956) described requisite variety as a lower bound on regulation. Beer described the viable system model. _The evidence is strong in theory and mixed in institutional application._
 - *Military command.* Prussian _Auftragstaktik_ and modern mission command say: specify the intent, delegate the means, and trust the unit. _The historical evidence is strong._
-- *Software and systems.* Brooks (1975) covers planned-mode pathologies. The distributed-systems canon (CAP, CRDTs, Kubernetes reconciliation, gossip protocols) is the engineering vocabulary for emergent coordination. The formal-methods tradition (TLA+ at AWS and Azure, the B method at RATP, property-based testing) is the engineering vocabulary for planned guarantees. _The evidence is strong in both directions._
+- *Software and systems.* Brooks (1975) described planned-mode pathologies. The distributed-systems canon (CAP, CRDTs, Kubernetes reconciliation, gossip protocols) is the engineering vocabulary for emergent coordination. The formal-methods tradition (TLA+ at AWS and Azure, the B method at RATP, property-based testing) is the engineering vocabulary for planned guarantees. _The evidence is strong in both directions._
 - *Human factors.* Bainbridge (1983) described the ironies of automation. Other research covers automation bias, complacency, and skill atrophy. _The evidence is strong across aviation, medicine, and now AI-assisted engineering._
 - *Security and authority.* Least-privilege design is from Saltzer & Schroeder (1975). The references for capability-based security are Dennis and Van Horn (1966) and modern work at Cambridge and MIT. The reference for zero-trust architecture is NIST SP 800-207 (2020). _The evidence is strong. The authority model in §3.7 is a direct adaptation._
 - *Philosophy of complexity.* Scott's _Seeing Like a State_ (1998) contrasts legibility with _metis_. Alexander (1965) wrote "A City is Not a Tree." _The evidence is mixed to strong. It depends on the claim._
@@ -1170,7 +1170,7 @@ A related body of practice converged in early 2026, under the name *harness engi
 
   _"anytime you find an agent makes a mistake, you take the time to engineer a solution such that the agent never makes that mistake again."_]
 - *February 11*: OpenAI publishes _Harness Engineering: Leveraging Codex in an Agent-First World_. It documents an internal experiment that shipped roughly a million lines of production code with no human-typed source.
-- *February 17*: Birgitta Böckeler (Thoughtworks) publishes the first analysis memo that identifies the convergence and names the gaps. Notably, maintainability is addressed, and functional correctness is not.
+- *February 17*: Birgitta Böckeler (Thoughtworks) publishes the first analysis memo that identifies the convergence and names the gaps. The notable gap is that maintainability is addressed, but functional correctness is not.
 - *March 2*: Stripe documents an evaluation harness for coding agents.
 - *March 12*: HumanLayer publishes on harness configuration for coding agents.
 - *March 24*: Anthropic publishes design notes for long-running application harnesses.
@@ -1178,7 +1178,13 @@ A related body of practice converged in early 2026, under the name *harness engi
 
 The core observation across these sources matches mine. As agents do more of the writing, the engineer's primary work shifts to _the design of the environment in which the agent operates._ OpenAI summarized it as _"designing environments, feedback loops, and control systems."_ That phrase could be the core of this framework.
 
-*The relationship to Many Hands Engineering is one of scope.* Harness engineering focuses on the per-agent execution environment: tools, context architecture, structured documentation, architectural constraints, custom linters, and garbage-collection loops. Many Hands Engineering is one level higher. It covers how multiple harnessed agents share a commons, and where decisions are placed on the planned/emergent spectrum. It covers how authority is granted and revoked, and how work compounds across loops. It also covers how human stewardship operates at a different rate than agent execution.
+*The relationship to Many Hands Engineering is one of scope.* Harness engineering focuses on the per-agent execution environment: tools, context architecture, structured documentation, architectural constraints, custom linters, and garbage-collection loops. Many Hands Engineering is one level higher. It covers these questions:
+
+- How multiple harnessed agents share a commons
+- Where decisions are placed on the planned/emergent spectrum
+- How authority is granted and revoked
+- How work compounds across loops
+- How human stewardship operates at a different rate than agent execution
 
 _A harness is a critical layer of terrain._ Specifically, it is the per-agent layer. A team with excellent harnesses but no shared terrain produces reliable per-agent work that fails to compound. A team with broad terrain but weak harnesses has agents that cannot be trusted to do anything.
 
