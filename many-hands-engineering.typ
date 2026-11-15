@@ -246,7 +246,7 @@ Before, the work was to build the thing. Now the work is to build the thing that
 
 More and more, software is the work of many hands. Some hands are human, and some are automated. Some are fast, and some are slow. Some are narrow in scope, and some carry judgment.
 
-None of this makes the old engineering wisdom obsolete. It makes that wisdom incomplete. We still need to know how to write good code. We also need to know what the old tools did not fully answer. The questions are: _what should be planned, what can be allowed to emerge, what should stay reversible, and where judgment should stay human._ Those questions are the center of this framework.
+None of this makes the old engineering wisdom obsolete. It makes that wisdom incomplete. We still need to know how to write good code. We also need to know what the old tools did not fully answer. That is: _what should be planned, what can be allowed to emerge, what should stay reversible, and where judgment should stay human._ Those questions are the center of this framework.
 
 The unit of work has shifted before:
 
@@ -283,12 +283,12 @@ A framework that does not treat this moment seriously is not a framework for sof
 A framework is worth its cost only if it is honest about what it knows. This document has three layers of claims, and the reader should treat each layer differently:
 
 - *Evidence-backed observations.* These are things that empirical research established or that the industry learned at high cost. They include Conway's Law, the impossibility theorems of distributed systems, and Ostrom's design principles for commons. They also include the human-factors literature on automation and the convergent failure patterns that major postmortems describe. The framework depends on these observations.
-- *Working design principles.* These patterns follow from the observations, and they seem to hold in the cases that I have studied or worked on. But they have not yet been verified at industry scale for the specific shape of agent-heavy engineering. These principles are placement, the staged transition, the economics of approval, and the five properties of trust. I commit to these principles because they are the best framing that I have found, not because the science is settled.
-- *Organizing metaphors.* This language helps us think clearly, and it does not claim to be literally true. The metaphors are terrain, the colony's immune system, and the four forces. These metaphors have a place here because they clarify. They are not theorems.
+- *Working design principles.* These are patterns that follow from the observations and seem to hold in the cases that I have studied or worked on. But they have not yet been verified at industry scale for the specific shape of agent-heavy engineering. These principles are placement, the staged transition, the economics of approval, and the five properties of trust. I commit to these principles because they are the best framing that I have found, not because the science is settled.
+- *Organizing metaphors.* This is language that helps us think clearly but does not claim to be literally true. The metaphors are terrain, the colony's immune system, and the four forces. These metaphors have a place here because they clarify. They are not theorems.
 
 Where it matters, I flag the layer of a claim. Where I do not flag, I am usually in the second layer. There, I describe what I think is the right move, based on what we know now. The reader who treats every line of this document as settled truth misses the point. The reader who treats every line as opinion also misses the point. The interesting work is to know which is which.
 
-This handbook will be wrong in specific ways. It should be revised when the evidence demands it. The structural claims have strong support:
+This handbook will be wrong in specific ways. It should be revised when the evidence demands it. These structural claims have strong support:
 
 - The spectrum is real.
 - Positive feedback is dangerous.
@@ -337,7 +337,7 @@ Most real systems are mixes of the two modes. The design work is to decide which
 
 *Two more terms appear throughout the handbook.*
 
-- *The commons.* The commons is the set of shared substrates through which emergent work coordinates. They include the repository, the vector store, the evaluation (eval) harness, the deployment pipeline, and the production namespace. Commons are _governable resources_, not passive storage. They degrade without governance. The lineage is Ostrom (1990).
+- *The commons.* The commons is the set of shared substrates through which emergent work coordinates. These substrates include the repository, the vector store, the evaluation (eval) harness, the deployment pipeline, and the production namespace. Commons are _governable resources_, not passive storage. They degrade without governance. The lineage is Ostrom (1990).
 - *Pace layers.* Pace layers are the strata of a system: governance (years), architecture (months), capabilities (weeks), orchestration (days), agents (hours), and invocations (minutes). Each layer changes at its own characteristic pace. It is a category error to mix signals across layers. The lineage is Stewart Brand (1994).
 
 *Four forces shape every terrain.*
@@ -368,7 +368,7 @@ The planned/emergent spectrum is not a rhetorical device. All the properties alo
   [Weakness], [Brittleness], [Commons degradation],
 )
 
-These properties cluster because they reinforce each other. A decision that is made centrally and verified against a specification also integrates on a schedule and fails hard when it is wrong. A decision that is made in a distributed way and verified through convergence integrates continuously and fails softly. A mix halfway between the two usually produces governance theatre. Governance theatre is the form of planned work without its substance, and the name of emergent work without its benefits. One example of such a mix is central authority with continuous asynchronous integration.
+These properties cluster because they reinforce each other. A decision that is made centrally and verified against a specification also integrates on a schedule and fails hard when it is wrong. A decision that is made in a distributed way and verified through convergence integrates continuously and fails softly. A mix halfway between the two, for example central authority with continuous asynchronous integration, usually produces governance theatre. Governance theatre is the form of planned work without its substance, and the name of emergent work without its benefits.
 
 At a boundary, there is a trade-off between guarantees and adaptivity. You cannot have both in the same region. You can have them in different regions, and well-designed boundaries connect those regions.
 
@@ -522,7 +522,7 @@ Every shared substrate in a many-hands platform is a commons. A commons is a res
 + *Monitoring.* Watchers are accountable to users, not to a distant authority.
 + *Graduated sanctions.* A first offense receives a lighter sanction than a repeated offense. In a platform, this means earned autonomy, envelopes that narrow after incidents, and approval rates that rise and fall with track record.
 + *Low-cost conflict resolution.* If conflict resolution is expensive, conflict will be hidden. Hidden conflict is worse than open conflict.
-+ *Rights to organize.* Teams and sub-platforms have meaningful local autonomy. An override of every local decision destroys the local knowledge that made the decision good.
++ *Rights to organize.* Teams and sub-platforms have meaningful local autonomy. Overriding every local decision destroys the local knowledge that made the decision good.
 + *Nested enterprises.* Large commons are layered commons. Each layer has its own rules at its own scope.
 
 If you ignore these principles, the platform eventually shows the tragedy of the commons. The cause is not villainy but the absence of governance. If you adopt them, the platform becomes durable in the way that long-lived open-source projects and healthy markets are durable. _The evidence is strong. Ostrom's work is among the most empirically grounded bodies of work in the social sciences. The mapping to software commons is more recent, but the mechanism is the same._
@@ -537,7 +537,7 @@ That puts nearly every traditional metric in a new frame. Velocity is not the po
 
 A many-hands platform is a dynamical system in the formal sense. It has states, transitions, and stable and unstable equilibria. It has phase transitions when parameters cross critical thresholds. If you treat it as static architecture, you make a category error that the system eventually punishes. You do not have to do the mathematics, but you should know what it says.
 
-*Signals spread, fade, and accumulate.* The name of this dynamic is reaction-diffusion. Three rates determine everything: how fast a signal spreads, how fast it fades, and how strongly it is reinforced. If decay is too slow, signals saturate into noise. If reinforcement outruns decay, the system locks onto whatever was reinforced first, even if it was wrong. In mathematical terms: without sufficient decay, self-reinforcing aggregation can grow without bound, which is the shape of many runaways that you will eventually see.
+*Signals spread, fade, and accumulate.* The name of this dynamic is reaction-diffusion. Three rates determine everything: how fast a signal spreads, how fast it fades, and how strongly it is reinforced. If decay is too slow, signals saturate into noise. If reinforcement outruns decay, the system locks onto whatever was reinforced first, even if it was wrong. In mathematical terms: without sufficient decay, self-reinforcing aggregation can grow without bound. That is the shape of many runaways that you will eventually see.
 
 *Positive feedback produces phase transitions.* Self-reinforcing dynamics change _qualitatively_ when a control parameter crosses a critical value. Below that value, perturbations die. Above that value, they grow without bound unless something counteracts them. Discontinuity is the default. One more agent can change everything.
 
@@ -547,7 +547,7 @@ A many-hands platform is a dynamical system in the formal sense. It has states, 
 
 *Some things are impossible.* CAP, PACELC, and FLP are theorems, not preferences. You cannot have consistency, availability, and partition tolerance at the same time. You cannot have deterministic asynchronous consensus that tolerates even one failure. No architecture evades these theorems. You choose where to pay the cost.
 
-*A regulator must match the variety that it regulates.* This is Ashby's Law. A one-size-fits-all safety filter cannot regulate a fleet of agents with high variety. Guardrails must be at least as differentiated as the failures that they guard against. This is not negotiable.
+*A regulator must match the variety that it regulates.* This is Ashby's Law. A single uniform safety filter cannot regulate a fleet of agents with high variety. Guardrails must be at least as differentiated as the failures that they guard against. This is not negotiable.
 
 *Intelligence turns coordination into political economy.* When agents can model incentives, they can deceive, free-ride, and game evaluators. The stable outcomes of the system tend to be the outcomes that the incentive structure supports, whether or not you intended them. _Increasingly, the design of the incentives is part of the design of the system._
 
@@ -559,7 +559,7 @@ Many-hands systems fail in two characteristic families. Learn to recognize each 
 
 A reinforcing signal without a counter-force becomes a runaway. The biological archetype is the _ant mill_. Army ants that lose the main trail follow each other in a circle until the colony dies of exhaustion. The signal did what signals do. The system lacked the mechanism to break the loop.
 
-In software, the same dynamic takes many forms. Retry storms overwhelm the service that receives the retries. Agents cite each other until ungrounded claims look well-grounded. Recommendation loops narrow onto local optima that the exploration rate can no longer escape. Evaluators that train on agent output drift until they reward surface features. Agents then optimize for those features directly.
+In software, the same dynamic takes many forms. Retry storms overwhelm the service that receives the retries. Agents cite each other until ungrounded claims look well-grounded. Recommendation loops narrow onto local optima that the exploration rate can no longer escape. When evaluators are trained on agent output, they drift until they reward surface features. Agents then optimize for those features directly.
 
 #table(
   columns: (1fr, 1fr, 1fr),
@@ -695,7 +695,7 @@ The remedy is not stability. Stability without disturbance is disguised brittlen
 
 - *Chaos engineering.* Netflix's Simian Army did not only test for resilience to failure. It made sure that the system never became dependent on the absence of failure. In a many-hands platform, the analog is broader: deliberate tool failures, simulated model regressions, random permission revocations, killed background loops, and corrupted non-critical signals.
 - *Adversarial verification.* Property-based testing, mutation testing, fuzzing, and the specification-by-adversary loop (§3.3) are forms of it. Replace the question _does this work?_ with the question _what would it take to break this?_ Then build the agent that systematically tries to break it.
-- *Forced removal.* Periodically remove something, and observe what happens. Candidates are a tool that the agents rely on, a piece of context that they always read, and a signal that they always consult. If the agents collapse, that reveals a hidden dependency. If they adapt, the dependency was not essential. _Subtraction reveals what addition concealed._
+- *Forced removal.* Periodically remove something. Candidates are a tool that the agents rely on, a piece of context that they always read, and a signal that they always consult. Then observe what happens. If the agents collapse, that reveals a hidden dependency. If they adapt, the dependency was not essential. _Subtraction reveals what addition concealed._
 
 == The discipline, in practice
 
@@ -708,9 +708,9 @@ Adversarial pressure is not a one-time exercise. It is a recurring practice with
 
 This is not testing. Testing asks whether the system meets a known specification. Adversarial pressure asks whether the system _silently relies on things that no one specified_. The first is verification. The second is discovery. Both matter, but they are not the same.
 
-The healthy posture is _equilibrium under disturbance_. A system in this posture holds its shape, but not because nothing challenges it. It holds its shape because it has built the capacity to absorb challenge and form again. That is what an immune system really does. That is what guardrails (§2.10) aim for.
+The healthy posture is _equilibrium under disturbance_. A system in this posture holds its shape, but not because nothing challenges it. It holds its shape because it has built the capacity to absorb challenge and to re-form. That is what an immune system really does. That is what guardrails (§2.10) aim for.
 
-*A fight against entropy that succeeds too well becomes its own pathology.* An over-stabilized system loses the capacity to adapt to what comes next. When it is done right, the work against entropy does not eliminate disorder. It maintains _responsive_ order.
+*A fight against entropy that succeeds too well becomes its own pathology.* An over-stabilized system loses the capacity to adapt to what comes next. When the work against entropy is done right, it does not eliminate disorder. It maintains _responsive_ order.
 
 = 2.12 — The shape of a healthy system in motion
 
@@ -719,7 +719,7 @@ Learn the signature of a healthy system. It is worth more than any checklist.
 - *Variety is high but bounded.* Different agents solve similar problems differently, within a range that the team recognizes. Outliers exist, and they are a sign of health. Their absence indicates premature convergence.
 - *Flow is steady.* Arrival rates and completion rates match over moderate windows. A sudden accumulation of WIP indicates a bottleneck. A sudden evaporation of WIP indicates silent drops.
 - *Escalations are rare but real.* When humans are called, it is for something that truly needs judgment. Frequent escalations mean that the autonomy envelope is too narrow. Zero escalations mean that the envelope is too wide, or that the system no longer reports real problems.
-- *Signals correlate with outcomes.* When evals say that quality is higher, users say that quality is higher. _When internal signals diverge from external reality, that is a warning that the system has started to optimize for its own metrics. It is the earliest and most important warning._
+- *Signals correlate with outcomes.* When evals say that quality is higher, users say that quality is higher. _When internal signals diverge from external reality, that is a warning that the system has started to optimize for its own metrics. It is the earliest and most important such warning._
 - *The commons is clean.* Stale signals are pruned. Abandoned branches die. Unused tools are retired. A commons that slowly fills with cruft slowly becomes uninhabitable.
 
 When all five hold, the system is *alive*, in the sense of this framework. Keep it alive. Do not freeze it, because that kills it. Instead, maintain the conditions under which it stays a healthy dynamical system.
@@ -855,7 +855,7 @@ After several starter loops run cleanly, richer loops become possible, because t
 
 Attempt these loops only after the starter loops and the middle loops are durable.
 
-*Feature prototype loop.* The team expresses a product intent as a small set of acceptance assertions and UX sketches. That intent becomes a sandbox where one or more agents build competing implementations against the assertions. A human compares the results on feel and fit, and chooses a direction. The loop does not replace product judgment. It parallelizes the _preparatory_ work so that judgment has more options. _Signal produced:_ a library of rejected implementations, which becomes a rich training signal about taste.
+*Feature prototype loop.* A product intent is expressed as a small set of acceptance assertions and UX sketches. That intent becomes a sandbox where one or more agents build competing implementations against the assertions. A human compares the results on feel and fit, and chooses a direction. The loop does not replace product judgment. It parallelizes the _preparatory_ work so that judgment has more options. _Signal produced:_ a library of rejected implementations, which becomes a rich training signal about taste.
 
 *Specification-by-adversary loop.* For a well-bounded interface, the team writes the intent as assertions. Adversarial subagents attempt to falsify each assertion against the implementation. An assertion that survives sustained attack counts as verified. An assertion that falls triggers a human decision: is the implementation wrong, or was the assertion wrong? This loop is most valuable at boundaries, and it degrades in deep emergent territory where intent resists specification. _Signal produced:_ an executable, continuously stressed specification that outlives its authors.
 
@@ -901,7 +901,7 @@ The transition that works proceeds in stages. Each stage makes the next stage po
 
 This is not a strict sequence. Stages overlap, and different regions can be at different stages. But the order is real. You cannot skip Stage 0. You cannot run Stage 4 before Stage 3. You cannot responsibly run Stage 5 unless Stages 2 and 3 are durable.
 
-*Stage 0 is the stage that teams skip most often.* The result is smart agents that act on illegible terrain: high activity, low signal, and no compounding. _The harness engineering literature (§4.2) is the deepest current account of how to do Stage 0 well. It covers architectural constraints encoded as linters and structural tests, and knowledge stored in the repository instead of in conversation. It also covers "garbage collection" loops that fight entropy. If your team is at Stage 0, that body of work is essential reading._
+*The stage that is most often skipped is Stage 0.* The result is smart agents that act on illegible terrain: high activity, low signal, and no compounding. _The harness engineering literature (§4.2) is the deepest current account of how to do Stage 0 well. It covers architectural constraints encoded as linters and structural tests, and knowledge stored in the repository instead of in conversation. It also covers "garbage collection" loops that fight entropy. If your team is at Stage 0, that body of work is essential reading._
 
 *The most tempting mistake is to broaden Stage 1 before you replicate it.* A dozen simple loops that compound are better than one sophisticated loop that consumes attention.
 
@@ -1080,7 +1080,7 @@ These cannot be measured. Attempts produce either superficial proxies (lines of 
 
 So far, the framework has been mostly about coordination, maintainability, and trust. Those are necessary, but they are not sufficient. A platform whose loops compound and whose commons stays clean can still ship code that does the wrong thing. It can also ship code that opens a hole that an attacker can use. _Authority answers who is allowed to do what. Correctness and security answer whether the completed work was right._
 
-Birgitta Böckeler identified the honest gap in her early read of the OpenAI harness work, and it applies to this framework too. The gap is this: it is easier to specify how code is organized than whether the code does what users really need. Architectural rigor and functional correctness are different problems. The first yields to mechanical enforcement. The second requires deeper feedback between the system and the world that it claims to serve.
+There is a gap that honesty requires me to state. Birgitta Böckeler identified it in her early read of the OpenAI harness work, and it applies to this framework too. The gap is this: it is easier to specify how code is organized than whether the code does what users really need. Architectural rigor and functional correctness are different problems. The first yields to mechanical enforcement. The second requires deeper feedback between the system and the world that it claims to serve.
 
 *Three commitments belong in any serious many-hands platform.*
 
@@ -1121,7 +1121,7 @@ Both modes will coexist. A team that always works in the many-hands mode over-en
 
 There is also a possible future that I want to acknowledge plainly. Single agents that are capable enough may eventually subsume some of what this framework addresses. If one sufficiently capable agent can hold the entire context, do the placement, run the loops, and exercise judgment, the multi-hand coordination layer becomes thinner.
 
-I do not think that we are there. I think the framework is useful in the world that we have, and probably in the world that we will have for the meaningful future. But I would rather name the possibility than pretend that it is not on the horizon.
+I do not think that we are there. I think the framework is useful in the world that we have, and probably in the world that we will have for the meaningful future. But I would rather name the possibility than pretend that it does not exist.
 
 = 3.11 — Monday morning
 
@@ -1131,7 +1131,7 @@ Do not pick the most interesting loop. Do not pick the loop with the highest ret
 
 The point of the first loop is not the loop. The point is the template. After one loop works end-to-end, the second loop is far cheaper, and the third is cheaper still. By the fifth loop, the team has a pattern that it applies almost mechanically. *The platform grows when you add loops, not when you make any single loop smarter.*
 
-Everything in this handbook serves to make the _nth_ loop cheaper than the _(n-1)th_. That includes the spectrum, the pace layers, the commons, the guardrails, the trust model, and the measurements. A team with one working loop and confidence that it can replicate the pattern is ahead of one with elaborate architecture and no working loop.
+Everything in this handbook serves to make the _nth_ loop cheaper than the _(n-1)th_. That includes the spectrum, the pace layers, the commons, the guardrails, the trust model, and the measurements. A team with one working loop and the confidence to replicate the pattern is ahead of a team with elaborate architecture and no working loop.
 
 Start there.
 
@@ -1158,7 +1158,7 @@ This part gives the lineage, the mathematics, the evidence, and the open questio
 - *Cybernetics.* Ashby (1956) described requisite variety as a lower bound on regulation. Beer described the viable system model. _The evidence is strong in theory and mixed in institutional application._
 - *Military command.* Prussian _Auftragstaktik_ and modern mission command say: specify the intent, delegate the means, and trust the unit. _The historical evidence is strong._
 - *Software and systems.* Brooks (1975) covers planned-mode pathologies. The distributed-systems canon (CAP, CRDTs, Kubernetes reconciliation, gossip protocols) is the engineering vocabulary for emergent coordination. The formal-methods tradition (TLA+ at AWS and Azure, the B method at RATP, property-based testing) is the engineering vocabulary for planned guarantees. _The evidence is strong in both directions._
-- *Human factors.* Bainbridge (1983) described the ironies of automation. There is research on automation bias, complacency, and skill atrophy. _The evidence is strong across aviation, medicine, and now AI-assisted engineering._
+- *Human factors.* Bainbridge (1983) described the ironies of automation. Other research covers automation bias, complacency, and skill atrophy. _The evidence is strong across aviation, medicine, and now AI-assisted engineering._
 - *Security and authority.* Least-privilege design is from Saltzer & Schroeder (1975). The references for capability-based security are Dennis and Van Horn (1966) and modern work at Cambridge and MIT. The reference for zero-trust architecture is NIST SP 800-207 (2020). _The evidence is strong. The authority model in §3.7 is a direct adaptation._
 - *Philosophy of complexity.* Scott's _Seeing Like a State_ (1998) contrasts legibility with _metis_. Alexander (1965) wrote "A City is Not a Tree." _The evidence is mixed to strong. It depends on the claim._
 
@@ -1178,7 +1178,7 @@ A related body of practice converged in early 2026, under the name *harness engi
 
 The core observation across these sources matches mine. As agents do more of the writing, the engineer's primary work shifts to _the design of the environment in which the agent operates._ OpenAI summarized it as _"designing environments, feedback loops, and control systems."_ That phrase could be the core of this framework.
 
-*The relationship to Many Hands Engineering is one of scope.* Harness engineering focuses on the per-agent execution environment: tools, context architecture, structured documentation, architectural constraints, custom linters, and garbage-collection loops. Many Hands Engineering is one level higher. It covers how multiple harnessed agents share a commons, where decisions are placed on the planned/emergent spectrum, and how authority is granted and revoked. It also covers how work compounds across loops and how human stewardship operates at a different rate than agent execution.
+*The relationship to Many Hands Engineering is one of scope.* Harness engineering focuses on the per-agent execution environment: tools, context architecture, structured documentation, architectural constraints, custom linters, and garbage-collection loops. Many Hands Engineering is one level higher. It covers how multiple harnessed agents share a commons, and where decisions are placed on the planned/emergent spectrum. It covers how authority is granted and revoked, and how work compounds across loops. It also covers how human stewardship operates at a different rate than agent execution.
 
 _A harness is a critical layer of terrain._ Specifically, it is the per-agent layer. A team with excellent harnesses but no shared terrain produces reliable per-agent work that fails to compound. A team with broad terrain but weak harnesses has agents that cannot be trusted to do anything.
 
