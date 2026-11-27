@@ -225,7 +225,7 @@ The handbook has four parts. Each part is useful on its own.
 
 If you remember only one line, remember this one:
 
-#thesis[It used to be building the thing. Now it's building the thing that makes the thing.]
+#thesis[It used to be making the thing. Now it's making the thing that makes the thing.]
 
 // ─────────────────────────────────────────────────────────
 // PART I
@@ -242,7 +242,7 @@ If you remember only one line, remember this one:
 
 = The turn
 
-It used to be building the thing. Now it's building the thing that makes the thing.
+It used to be making the thing. Now it's making the thing that makes the thing.
 
 More and more, software is the work of many hands. Some hands are human, and some are automated. Some are fast, and some are slow. Some are narrow in scope, and some carry judgment.
 
@@ -1267,4 +1267,4 @@ The framework will be wrong in specific ways, and it should be revised when the 
 
 Build accordingly. And when the terrain is well built, and the loops run, and the work is worth your approval, say so.
 
-#thesis[It used to be building the thing. Now it's building the thing that makes the thing.]
+#thesis[It used to be making the thing. Now it's making the thing that makes the thing.]
